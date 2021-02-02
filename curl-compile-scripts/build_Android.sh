@@ -1,5 +1,5 @@
 #!/bin/bash
-TARGET=android-19
+TARGET=android-21
 
 real_path() {
 	[[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
@@ -31,7 +31,8 @@ fi
 
 #Configure OpenSSL
 cd $SSLPATH
-./Configure android no-asm no-shared no-cast no-idea no-camellia no-whirpool
+#./Configure android no-asm no-shared no-cast no-idea no-camellia no-whirpool
+./Configure android no-engine no-gost no-asm no-shared no-cast no-idea no-camellia no-whirpool
 EXITCODE=$?
 if [ $EXITCODE -ne 0 ]; then
 	echo "Error running the ssl configure program"
@@ -94,8 +95,8 @@ export LDFLAGS="-march=$ARCH -L$SCRIPTPATH/obj/local/armeabi-v7a"
 	--host=arm-linux-androideabi \
 	--target=arm-linux-androideabi \
 	--with-ssl=$SSLPATH \
-	--enable-static \
-	--disable-shared \
+	--disable-static \
+	--enable-shared \
 	--disable-verbose \
 	--enable-threaded-resolver \
 	--enable-libgcc \
@@ -124,8 +125,8 @@ for p in ${PLATFORMS[*]}; do
   mkdir -p $DESTDIR/$p
   STRIP=$($SCRIPTPATH/ndk-which strip $p)
 
-  SRC=$SCRIPTPATH/obj/local/$p/libcurl.a
-  DEST=$DESTDIR/$p/libcurl.a
+  SRC=$SCRIPTPATH/obj/local/$p/libcurl.so
+  DEST=$DESTDIR/$p/libcurl.so
 
   if [ -z "$STRIP" ]; then
     echo "WARNING: Could not find 'strip' for $p"
